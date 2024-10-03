@@ -19,7 +19,7 @@ def start(update: Update, context):
         f"Welcome to {bot_name}. This is a 𝗳𝗶𝗹𝗲 𝗰𝗼𝗻𝘃𝗲𝗿𝘀𝗶𝗼𝗻 𝗯𝗼𝘁 that converts files from different formats to your desired format 👾\n\n"
         "𝗦𝘂𝗽𝗽𝗼𝗿𝘁𝗲𝗱 𝗳𝗼𝗿𝗺𝗮𝘁𝘀 𝗶𝗻𝗰𝗹𝘂𝗱𝗲:\n"
         "- 𝗜𝗺𝗮𝗴𝗲𝘀: JPEG, PNG, GIF, BMP, and more.\n"
-        "- 𝗔𝘂𝗱𝗶𝗼: MP3, WAV, AAC, FLAC, and more.\n"
+        "- 𝗔𝘂𝗱𝗶𝗼: MP3, WAV, AAC, OGG, and more.\n"
         "- 𝗩𝗶𝗱𝗲𝗼: MP4, AVI, MKV, MOV, and more.\n"
         "- 𝗗𝗼𝗰𝘂𝗺𝗲𝗻𝘁𝘀: PDF, DOCX, TXT, and more.\n\n"
         "To get started, simply send me the file you want to convert, followed by the format you wish to convert it to. I am here to help you with all your conversion needs!"
@@ -36,10 +36,6 @@ def start(update: Update, context):
     update.message.reply_photo(photo=image_link, caption=start_command, reply_markup=InlineKeyboardMarkup(inline_buttons))
 
 def convert(update: Update, context):
-    """Sends the inline keyboard for conversion options."""
-    update.message.reply_text("Please choose the type of conversion:", reply_markup=create_conversion_keyboard())
-
-def create_conversion_keyboard():
     keyboard = [
         [InlineKeyboardButton("Image Conversion", callback_data='convert_image')],
         [InlineKeyboardButton("Audio Conversion", callback_data='convert_audio')],
@@ -48,11 +44,28 @@ def create_conversion_keyboard():
         [InlineKeyboardButton("ZIP Extraction", callback_data='extract_zip')],
         [InlineKeyboardButton("Torrent Conversion", callback_data='convert_torrent')],
     ]
-    return InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Please choose the conversion type:", reply_markup=InlineKeyboardMarkup(keyboard))
+
+def button_callback(update: Update, context):
+    query = update.callback_query
+    query.answer()  # Acknowledge the callback to avoid issues
+
+    # Set the conversion type in user_data for later use
+    conversion_type = query.data
+    context.user_data['conversion_type'] = conversion_type
+
+    # Notify user that the bot is waiting for a file
+    query.edit_message_text(f"You selected {conversion_type.replace('_', ' ').capitalize()}. Please upload the file for conversion.")
 
 def handle_file(update: Update, context):
+    # Retrieve the conversion type set by the inline button
     conversion_type = context.user_data.get('conversion_type')
 
+    if not conversion_type:
+        update.message.reply_text("Please choose a conversion type using the /convert command before sending a file.")
+        return
+
+    # Process the file based on the conversion type
     if conversion_type == 'convert_image':
         handle_image_file(update, context)
     elif conversion_type == 'convert_audio':
@@ -72,13 +85,13 @@ def main():
 
     # Command handlers
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("convert", convert))  # Added /convert command
+    dp.add_handler(CommandHandler("convert", convert))
 
-    # Message handlers
+    # Callback query handler for inline buttons
+    dp.add_handler(CallbackQueryHandler(button_callback))
+
+    # Message handler for file uploads
     dp.add_handler(MessageHandler(Filters.document, handle_file))
-
-    # Callback query handler for conversion selection
-    dp.add_handler(CallbackQueryHandler(handle_file, pattern='^(convert_image|convert_audio|convert_text|convert_video|extract_zip|convert_torrent)$'))
 
     updater.start_polling()
     updater.idle()
