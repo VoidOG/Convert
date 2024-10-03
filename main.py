@@ -1,6 +1,6 @@
 import os
 import time
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputFile
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler, MessageHandler, Filters, Updater
 from audio import handle_audio_file
 from image import handle_image_file
@@ -70,9 +70,14 @@ def main():
     updater = Updater(TOKEN)
     dp = updater.dispatcher
 
+    # Command handlers
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CallbackQueryHandler(handle_file, pattern='^(convert_image|convert_audio|convert_text|convert_video|extract_rar|extract_zip|convert_torrent)$'))
+    
+    # Message handlers
     dp.add_handler(MessageHandler(Filters.document, handle_file))
+
+    # Callback query handler for conversion selection
+    dp.add_handler(CallbackQueryHandler(handle_file, pattern='^(convert_image|convert_audio|convert_text|convert_video|extract_rar|extract_zip|convert_torrent)$'))
 
     updater.start_polling()
     updater.idle()
