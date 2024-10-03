@@ -19,7 +19,7 @@ def start(update: Update, context):
         f"Welcome to {bot_name}. This is a 𝗳𝗶𝗹𝗲 𝗰𝗼𝗻𝘃𝗲𝗿𝘀𝗶𝗼𝗻 𝗯𝗼𝘁 that converts files from different formats to your desired format 👾\n\n"
         "𝗦𝘂𝗽𝗽𝗼𝗿𝘁𝗲𝗱 𝗳𝗼𝗿𝗺𝗮𝘁𝘀 𝗶𝗻𝗰𝗹𝘂𝗱𝗲:\n"
         "- 𝗜𝗺𝗮𝗴𝗲𝘀: JPEG, PNG, GIF, BMP, and more.\n"
-        "- 𝗔𝘂𝗱𝗶𝗼: MP3, WAV, AAC, OGG, and more.\n"
+        "- 𝗔𝘂𝗱𝗶𝗼: MP3, WAV, AAC, FLAC, and more.\n"
         "- 𝗩𝗶𝗱𝗲𝗼: MP4, AVI, MKV, MOV, and more.\n"
         "- 𝗗𝗼𝗰𝘂𝗺𝗲𝗻𝘁𝘀: PDF, DOCX, TXT, and more.\n\n"
         "To get started, simply send me the file you want to convert, followed by the format you wish to convert it to. I am here to help you with all your conversion needs!"
@@ -65,19 +65,28 @@ def handle_file(update: Update, context):
         update.message.reply_text("Please choose a conversion type using the /convert command before sending a file.")
         return
 
+    # Log the conversion type for debugging
+    print(f"Received file for conversion: {conversion_type}")
+
     # Process the file based on the conversion type
-    if conversion_type == 'convert_image':
-        handle_image_file(update, context)
-    elif conversion_type == 'convert_audio':
-        handle_audio_file(update, context)
-    elif conversion_type == 'convert_text':
-        handle_text_file(update, context)
-    elif conversion_type == 'convert_video':
-        handle_video_file(update, context)
-    elif conversion_type == 'extract_zip':
-        handle_zip_file(update, context)
-    elif conversion_type == 'convert_torrent':
-        handle_torrent_file(update, context)
+    try:
+        if conversion_type == 'convert_image':
+            handle_image_file(update, context)
+        elif conversion_type == 'convert_audio':
+            handle_audio_file(update, context)
+        elif conversion_type == 'convert_text':
+            handle_text_file(update, context)
+        elif conversion_type == 'convert_video':
+            handle_video_file(update, context)
+        elif conversion_type == 'extract_zip':
+            handle_zip_file(update, context)
+        elif conversion_type == 'convert_torrent':
+            handle_torrent_file(update, context)
+        else:
+            update.message.reply_text("Invalid conversion type selected.")
+    except Exception as e:
+        update.message.reply_text(f"An error occurred during conversion: {str(e)}")
+        print(f"Error during conversion: {str(e)}")  # Log the error for debugging
 
 def main():
     updater = Updater(TOKEN)
