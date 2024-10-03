@@ -41,7 +41,6 @@ def create_conversion_keyboard():
         [InlineKeyboardButton("Audio Conversion", callback_data='convert_audio')],
         [InlineKeyboardButton("Text to PDF", callback_data='convert_text')],
         [InlineKeyboardButton("Video Conversion", callback_data='convert_video')],
-        [InlineKeyboardButton("RAR Extraction", callback_data='extract_rar')],
         [InlineKeyboardButton("ZIP Extraction", callback_data='extract_zip')],
         [InlineKeyboardButton("Torrent Conversion", callback_data='convert_torrent')],
     ]
@@ -58,8 +57,6 @@ def handle_file(update: Update, context):
         handle_text_file(update, context)
     elif conversion_type == 'convert_video':
         handle_video_file(update, context)
-    elif conversion_type == 'extract_rar':
-        handle_rar_file(update, context)
     elif conversion_type == 'extract_zip':
         handle_zip_file(update, context)
     elif conversion_type == 'convert_torrent':
@@ -76,7 +73,7 @@ def main():
     dp.add_handler(MessageHandler(Filters.document, handle_file))
 
     # Callback query handler for conversion selection
-    dp.add_handler(CallbackQueryHandler(handle_file, pattern='^(convert_image|convert_audio|convert_text|convert_video|extract_rar|extract_zip|convert_torrent)$'))
+    dp.add_handler(CallbackQueryHandler(handle_file, pattern='^(convert_image|convert_audio|convert_text|convert_video|extract_zip|convert_torrent)$'))
 
     updater.start_polling()
     updater.idle()
