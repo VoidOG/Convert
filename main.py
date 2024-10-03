@@ -6,7 +6,6 @@ from audio import handle_audio_file
 from image import handle_image_file
 from text import handle_text_file
 from video import handle_video_file
-from rar import handle_rar_file
 from zip import handle_zip_file
 from torrent import handle_torrent_file
 
