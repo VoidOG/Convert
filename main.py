@@ -35,6 +35,10 @@ def start(update: Update, context):
     # Send the welcome message with the image and inline buttons
     update.message.reply_photo(photo=image_link, caption=start_command, reply_markup=InlineKeyboardMarkup(inline_buttons))
 
+def convert(update: Update, context):
+    """Sends the inline keyboard for conversion options."""
+    update.message.reply_text("Please choose the type of conversion:", reply_markup=create_conversion_keyboard())
+
 def create_conversion_keyboard():
     keyboard = [
         [InlineKeyboardButton("Image Conversion", callback_data='convert_image')],
@@ -68,7 +72,8 @@ def main():
 
     # Command handlers
     dp.add_handler(CommandHandler("start", start))
-    
+    dp.add_handler(CommandHandler("convert", convert))  # Added /convert command
+
     # Message handlers
     dp.add_handler(MessageHandler(Filters.document, handle_file))
 
